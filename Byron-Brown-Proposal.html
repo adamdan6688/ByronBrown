@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PepLookup · Proposal for Byron Brown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F4F4; --card:#FFFFFF; --ink:#0E0E0E; --text:#2B2B2B; --muted:#666666;
+  --line:#E4E4E4; --soft:#F7F7F7; --green:#2B6A4B; --green-dark:#1F5139; --green-soft:#E7F1EB;
+  --orange:#E8590C; --dark:#111111;
+  --r-lg:24px; --r-md:16px;
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:100px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Archivo',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,svg{max-width:100%}
+.wrap{width:100%;max-width:1100px;margin:0 auto;padding:0 20px}
+.mono{font-family:'Space Mono',ui-monospace,monospace;text-transform:uppercase;letter-spacing:.18em;font-size:12px;font-weight:700;color:var(--muted)}
+h1,h2,h3{color:var(--ink);margin:0}
+p{margin:0}
+
+/* NAV */
+.nav-shell{position:sticky;top:12px;z-index:50;padding:0 12px}
+.nav{
+  max-width:1100px;margin:0 auto;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid var(--line);border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.06);
+  display:flex;align-items:center;gap:12px;padding:8px 8px 8px 22px;animation:drop .7s var(--ease) both;
+}
+.logo{font-weight:900;font-size:24px;letter-spacing:-.06em;text-decoration:none;color:var(--ink);flex-shrink:0}
+.nav-links{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{
+  text-decoration:none;color:var(--ink);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  padding:11px 14px;border-radius:999px;white-space:nowrap;transition:background .25s,color .25s;
+}
+.nav-links a:hover{background:var(--soft)}
+.nav-links a.active{background:var(--ink);color:#fff}
+
+/* HERO */
+.hero{text-align:center;padding-top:64px;padding-bottom:40px}
+.pill{display:inline-flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:10px 18px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);position:relative;flex-shrink:0}
+.dot::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--green);animation:pulse 1.8s ease-out infinite}
+.hero h1{margin-top:26px;font-weight:900;letter-spacing:-.05em;line-height:1;font-size:clamp(38px,8vw,88px)}
+.hero h1 span{display:block;color:var(--green)}
+.hero .lead{max-width:640px;margin:22px auto 0;font-size:clamp(16px,2.2vw,20px);color:var(--muted)}
+.who{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:28px}
+.who div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:15px}
+.who b{color:var(--ink)}
+.who a{color:var(--green);font-weight:700;text-decoration:none}
+.hero > *{animation:rise .8s var(--ease) both}
+.hero > *:nth-child(2){animation-delay:.08s}.hero > *:nth-child(3){animation-delay:.16s}.hero > *:nth-child(4){animation-delay:.24s}
+
+/* MARQUEE */
+.marquee{background:var(--dark);border-radius:999px;overflow:hidden;padding:20px 0;position:relative;
+  background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1px);background-size:16px 16px}
+.track{display:flex;width:max-content;animation:scroll 32s linear infinite}
+.track span{font-family:'Space Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:.22em;color:#EDEDED;font-size:15px;white-space:nowrap;padding:0 28px}
+.track span::after{content:"·";color:#666;margin-left:56px}
+
+/* SECTIONS */
+section{padding-top:64px}
+.head{margin-bottom:24px}
+.head h2{margin-top:8px;font-weight:900;letter-spacing:-.04em;line-height:1.05;font-size:clamp(30px,5vw,52px)}
+.head h2 em{font-style:italic;color:var(--green)}
+.head p{margin-top:12px;max-width:620px;font-size:clamp(16px,2vw,18px);color:var(--muted)}
+.num{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;font-size:13px;font-weight:800;margin-right:10px;vertical-align:middle;letter-spacing:0}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:clamp(20px,3.5vw,32px);transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
+.card:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(0,0,0,.06)}
+.card h3{font-size:clamp(19px,2.4vw,22px);font-weight:800;letter-spacing:-.02em}
+.card > p{margin-top:8px;color:var(--muted)}
+
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}
+.grid-2{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+
+/* AT A GLANCE */
+.glance .card{display:flex;flex-direction:column;gap:6px}
+.glance .big{font-size:clamp(30px,4vw,40px);font-weight:900;letter-spacing:-.04em;line-height:1.05;color:var(--ink)}
+.glance .big.green{color:var(--green)}
+.glance small{color:var(--muted);font-size:15px}
+.tag{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;background:#FFF5EE;color:var(--orange);border:1px solid #F3C3A3;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+
+/* CHECK LIST */
+.checks{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:10px}
+.checks li{display:flex;gap:10px;align-items:flex-start;font-size:16px;color:var(--text)}
+.checks li::before{
+  content:"";flex-shrink:0;width:20px;height:20px;margin-top:2px;border-radius:50%;background:var(--green-soft)
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232B6A4B' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E") center/12px no-repeat;
+}
+.dark .checks li{color:#DADADA}
+.dark .checks li::before{background-color:rgba(127,209,163,.15)}
+
+.info{display:flex;gap:12px;align-items:flex-start;background:var(--green-soft);color:var(--green-dark);border-radius:var(--r-md);padding:16px 18px;margin-top:16px;font-size:16px}
+.info svg{flex-shrink:0;margin-top:2px}
+
+/* PRICE */
+.dark{background:var(--dark);color:#EEE;border-color:var(--dark);position:relative;overflow:hidden;
+  background-image:radial-gradient(rgba(255,255,255,.06) 1px,transparent 1px);background-size:18px 18px}
+.dark h3{color:#fff}
+.price-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 24px;padding-bottom:22px;border-bottom:1px solid #2A2A2A}
+.price-row .mono{color:#9A9A9A}
+.price{font-size:clamp(52px,9vw,88px);font-weight:900;letter-spacing:-.05em;line-height:.95;color:#fff}
+.price small{font-size:16px;font-weight:500;letter-spacing:0;color:#9A9A9A;margin-left:6px}
+.dark .checks{grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}
+
+/* PAYMENT TABLE */
+.steps-list{display:grid;gap:12px;margin-top:16px}
+.pay-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:16px 20px}
+.pay-row .pct{font-size:28px;font-weight:900;color:var(--green);letter-spacing:-.03em;min-width:66px}
+.pay-row .when{color:var(--text);font-size:16px}
+.pay-row .when b{display:block;color:var(--ink)}
+.pay-row .amt{font-size:20px;font-weight:800;color:var(--ink)}
+.bar{grid-column:1/-1;height:6px;background:var(--soft);border-radius:999px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--green);border-radius:999px;transition:width 1.3s var(--ease) .2s}
+.in .bar i{width:var(--w)}
+
+/* TIMELINE */
+.tl{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));margin-top:16px}
+.tl-bar{height:8px;border-radius:999px;background:var(--line);overflow:hidden}
+.tl-bar i{display:block;height:100%;width:0;background:var(--ink);transition:width 1.3s var(--ease) .2s}
+.tl > div:nth-child(2) .tl-bar i{background:var(--green);transition-delay:.9s}
+.in .tl-bar i{width:100%}
+.tl b{display:block;margin-top:10px;color:var(--ink)}
+.tl span{color:var(--muted);font-size:15px}
+
+/* MONTHLY */
+.m-price{font-size:clamp(40px,6vw,60px);font-weight:900;letter-spacing:-.04em;color:var(--ink);line-height:1}
+.m-price small{font-size:18px;font-weight:500;color:var(--muted);letter-spacing:0}
+.choice{border:2px solid var(--line)}
+.choice.pick{border-color:var(--green)}
+.choice .mono{color:var(--green)}
+.choice h3{margin-top:6px}
+
+/* NOTES */
+.notes{list-style:none;padding:0;margin:0;display:grid;gap:12px;counter-reset:n}
+.notes li{counter-increment:n;display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;font-size:16px}
+.notes li::before{content:counter(n);flex-shrink:0;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;font-weight:800;font-size:13px}
+.notes b{color:var(--ink)}
+
+/* CTA */
+.cta{margin-top:64px;border-radius:28px;padding:clamp(40px,7vw,80px) clamp(20px,5vw,48px);text-align:center}
+.cta h2{font-weight:900;letter-spacing:-.05em;line-height:1;font-size:clamp(36px,7vw,80px);color:#fff;margin-top:14px}
+.cta > p{max-width:600px;margin:16px auto 0;color:#BDBDBD;font-size:clamp(16px,2vw,18px)}
+.next{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));max-width:880px;margin:32px auto 0;text-align:left}
+.next div{background:rgba(255,255,255,.05);border:1px solid #2E2E2E;border-radius:var(--r-md);padding:18px;color:#E2E2E2;font-size:16px}
+.next b{display:block;font-family:'Space Mono',monospace;color:#7FD1A3;font-size:13px;margin-bottom:4px}
+.change{display:flex;gap:12px;align-items:flex-start;max-width:880px;margin:16px auto 0;text-align:left;background:rgba(127,209,163,.1);border:1px dashed #3C6B52;border-radius:var(--r-md);padding:18px 20px;color:#D6EBDD;font-size:16px}
+.change svg{flex-shrink:0;margin-top:2px}
+
+footer{padding:36px 20px 48px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;color:var(--muted);font-size:14px;max-width:1100px;margin:0 auto}
+
+/* ANIMATION */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes drop{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%{transform:scale(.6);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}.bar i{width:var(--w)}.tl-bar i{width:100%}
+}
+
+/* RESPONSIVE */
+@media (max-width:760px){
+  .nav{padding-left:16px}
+  .logo{font-size:20px}
+  .nav-links a{padding:10px 11px;font-size:11px;letter-spacing:.1em}
+  .hero{padding-top:44px;padding-bottom:28px}
+  section{padding-top:48px}
+  .marquee{border-radius:20px;padding:16px 0}
+  .track span{font-size:13px;padding:0 18px}
+  .track span::after{margin-left:36px}
+  .pay-row{grid-template-columns:auto 1fr;gap:4px 14px}
+  .pay-row .amt{grid-column:2;font-size:18px}
+  .pay-row .pct{grid-row:span 2}
+}
+@media (max-width:420px){
+  .logo{display:none}
+  .nav{padding-left:8px}
+}
+@media print{
+  .nav-shell{position:static}.reveal{opacity:1;transform:none}.bar i{width:var(--w)}.tl-bar i{width:100%}
+  .card,.pay-row,.notes li{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<div class="nav-shell">
+  <nav class="nav" aria-label="Proposal sections">
+    <a class="logo" href="#top">PepLookup</a>
+    <div class="nav-links">
+      <a href="#summary" class="active">Summary</a>
+      <a href="#platform">Platform</a>
+      <a href="#community">Community</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#monthly">Monthly</a>
+      <a href="#notes">Notes</a>
+    </div>
+  </nav>
+</div>
+
+<header class="wrap hero" id="top">
+  <div class="pill"><span class="dot"></span><span class="mono" style="color:var(--ink)">Project Proposal</span></div>
+  <h1>Your Peptide Platform <span>&amp; Community.</span></h1>
+  <p class="lead">I will build you a vendor comparison platform like PepLookup, plus a fully set up Skool community to grow your audience.</p>
+  <div class="who">
+    <div>For: <b>Byron Brown</b></div>
+    <div>From: <b>Adam Dan</b></div>
+    <div>Example: <a href="https://www.peplookup.com" target="_blank" rel="noopener">peplookup.com</a></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="marquee" aria-hidden="true">
+    <div class="track">
+      <span>Admin Dashboard</span><span>Verified Vendors</span><span>Skool Community</span><span>30 Day Content</span><span>Google Analytics</span>
+      <span>Admin Dashboard</span><span>Verified Vendors</span><span>Skool Community</span><span>30 Day Content</span><span>Google Analytics</span>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <!-- 1. SUMMARY -->
+  <section id="summary">
+    <div class="head reveal">
+      <span class="mono">At a glance</span>
+      <h2>The plan in <em>30 seconds.</em></h2>
+    </div>
+    <div class="grid glance">
+      <div class="card reveal"><span class="mono">What you get</span><div class="big">2 parts</div><small>A platform and a Skool community</small></div>
+      <div class="card reveal d1"><span class="mono">One time price</span><div class="big green">$1,000</div><small>Everything to launch, all included</small></div>
+      <div class="card reveal d2"><span class="mono">Timeline</span><div class="big">~20 days</div><small>10 for platform, 10 for community</small></div>
+      <div class="card reveal d3"><span class="mono">Monthly (optional)</span><div class="big">$500</div><span class="tag">First month free</span></div>
+    </div>
+  </section>
+
+  <!-- 2. PLATFORM -->
+  <section id="platform">
+    <div class="head reveal">
+      <span class="mono"><span class="num">1</span>Part one</span>
+      <h2>The <em>platform.</em></h2>
+      <p>A website like PepLookup where users compare trusted vendors and products. You earn from vendor referrals and can also sell your own peptides.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card reveal">
+        <h3>Admin dashboard</h3>
+        <p>Manage everything yourself. No coding needed.</p>
+        <ul class="checks">
+          <li>Add, edit or remove vendors</li>
+          <li>Add, edit or remove reviews</li>
+          <li>Add and manage products</li>
+          <li>Update any section of the website</li>
+        </ul>
+      </div>
+      <div class="card reveal d1">
+        <h3>Setup included</h3>
+        <p>Ready to use from day one.</p>
+        <ul class="checks">
+          <li>5 to 10 top vendors added</li>
+          <li>20 to 30 products per vendor</li>
+          <li>.com domain and hosting</li>
+          <li>Google Analytics and Search Console</li>
+          <li>Your own theme, or a design like PepLookup</li>
+        </ul>
+      </div>
+    </div>
+    <div class="info reveal">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      <span><b>Ready in 7 to 10 days.</b> I can research the vendors for you, or we can pick them together.</span>
+    </div>
+  </section>
+
+  <!-- 3. COMMUNITY -->
+  <section id="community">
+    <div class="head reveal">
+      <span class="mono"><span class="num">2</span>Part two</span>
+      <h2>The Skool <em>community.</em></h2>
+      <p>A branded community that teaches people about peptides and sends visitors to your platform.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card reveal">
+        <h3>Branding and SEO</h3>
+        <ul class="checks">
+          <li>Community logo and cover image</li>
+          <li>3 to 4 banner images</li>
+          <li>Professional description</li>
+          <li>SEO for keywords like "peptides"</li>
+        </ul>
+      </div>
+      <div class="card reveal d1">
+        <h3>Content</h3>
+        <ul class="checks">
+          <li>6 to 7 classroom sections (e.g. "Healing Peptides")</li>
+          <li>Pages for each peptide with images</li>
+          <li>30 day content plan</li>
+          <li>1 post every day for 30 days</li>
+        </ul>
+      </div>
+    </div>
+    <div class="info reveal">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      <span><b>Ready in 7 to 10 days</b> after the platform is finished.</span>
+    </div>
+  </section>
+
+  <!-- 4. PRICING -->
+  <section id="pricing">
+    <div class="head reveal">
+      <span class="mono"><span class="num">3</span>Pricing</span>
+      <h2>One time <em>setup.</em></h2>
+    </div>
+
+    <div class="card dark reveal">
+      <div class="price-row">
+        <div><span class="mono">Platform + Community</span><h3 style="margin-top:6px;font-size:clamp(22px,3vw,28px)">Complete package</h3></div>
+        <div class="price">$1,000<small>one time</small></div>
+      </div>
+      <ul class="checks">
+        <li>Platform and admin dashboard</li>
+        <li>Domain, hosting and going live</li>
+        <li>Vendor and product setup</li>
+        <li>Google Analytics and Search Console</li>
+        <li>Full Skool community setup</li>
+        <li>Branding, graphics and SEO</li>
+        <li>6 to 7 classroom sections</li>
+        <li>30 days of daily posts</li>
+        <li>3 month organic marketing plan</li>
+      </ul>
+    </div>
+
+    <div class="card reveal" style="margin-top:16px">
+      <h3>How you pay</h3>
+      <p>Split into 3 simple payments.</p>
+      <div class="steps-list">
+        <div class="pay-row"><div class="pct">40%</div><div class="when"><b>To start</b>Paid upfront to begin work</div><div class="amt">$400</div><div class="bar"><i style="--w:40%"></i></div></div>
+        <div class="pay-row"><div class="pct">30%</div><div class="when"><b>Platform done</b>When the website is finished</div><div class="amt">$300</div><div class="bar"><i style="--w:70%"></i></div></div>
+        <div class="pay-row"><div class="pct">30%</div><div class="when"><b>Community done</b>When Skool setup is finished</div><div class="amt">$300</div><div class="bar"><i style="--w:100%"></i></div></div>
+      </div>
+    </div>
+
+    <div class="card reveal" style="margin-top:16px">
+      <h3>Timeline</h3>
+      <div class="tl">
+        <div><div class="tl-bar"><i></i></div><b>Days 1 to 10</b><span>Build the platform</span></div>
+        <div><div class="tl-bar"><i></i></div><b>Days 11 to 20</b><span>Set up the community</span></div>
+      </div>
+      <p style="margin-top:14px;color:var(--muted);font-size:15px">May take slightly longer depending on content and custom requests.</p>
+    </div>
+  </section>
+
+  <!-- 5. MONTHLY -->
+  <section id="monthly">
+    <div class="head reveal">
+      <span class="mono"><span class="num">4</span>Optional</span>
+      <h2>Monthly <em>management.</em></h2>
+      <p>After launch, you choose: manage it yourself, or let me handle it.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card choice reveal">
+        <span class="mono">Option A</span>
+        <h3>You manage it</h3>
+        <p>I build and set everything up. You run it yourself with the admin dashboard.</p>
+        <div class="m-price" style="margin-top:18px">$0<small> / month</small></div>
+      </div>
+      <div class="card choice pick reveal d1">
+        <span class="mono">Option B · Recommended</span>
+        <h3>I manage it</h3>
+        <p>I keep the platform and community running and growing for you.</p>
+        <div class="m-price" style="margin-top:18px">$500<small> / month</small></div>
+        <span class="tag" style="margin-top:12px">First month free</span>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:16px">
+      <div class="card reveal">
+        <h3>Option B: platform work</h3>
+        <ul class="checks">
+          <li>Changes and new features</li>
+          <li>Fixing technical issues</li>
+          <li>Adding and updating vendors</li>
+          <li>Adding and updating products</li>
+        </ul>
+      </div>
+      <div class="card reveal d1">
+        <h3>Option B: community work</h3>
+        <ul class="checks">
+          <li>Daily peptide posts</li>
+          <li>Growing member engagement</li>
+          <li>Promoting your platform</li>
+          <li>New classroom content</li>
+        </ul>
+      </div>
+    </div>
+    <div class="info reveal">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      <span>You reply to member messages when needed. I work <b>Monday to Friday</b>.</span>
+    </div>
+  </section>
+
+  <!-- 6. NOTES -->
+  <section id="notes">
+    <div class="head reveal">
+      <span class="mono"><span class="num">5</span>Good to know</span>
+      <h2>Payment <em>notes.</em></h2>
+    </div>
+    <ol class="notes reveal">
+      <li><span><b>40% upfront to start.</b> If you decide to start, $400 is needed to begin the work.</span></li>
+      <li><span><b>30 days of content.</b> The $1,000 plan includes one month of content, starting the day we officially begin the project.</span></li>
+      <li><span><b>First month free.</b> No monthly management fee in the first month. It starts from the second month.</span></li>
+      <li><span><b>Same date every month.</b> Monthly payments are made on the same date each month.</span></li>
+      <li><span><b>15 days notice to stop.</b> You can stop monthly management anytime. Just let me know at least 15 days in advance.</span></li>
+      <li><span><b>Manage it yourself if you like.</b> I can simply build and set up everything, and you run it afterward.</span></li>
+    </ol>
+  </section>
+
+  <!-- CTA -->
+  <div class="card dark cta reveal">
+    <span class="mono" style="color:#9A9A9A">Next steps</span>
+    <h2>Let's build it.</h2>
+    <p>You handle a small amount of work. I take care of the technical side, content and growth.</p>
+    <div class="next">
+      <div><b>01</b>Confirm the plan and any extras</div>
+      <div><b>02</b>Send the 40% deposit ($400)</div>
+      <div><b>03</b>Share your vendors and preferred theme</div>
+    </div>
+    <div class="change">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <span><b>Note:</b> If you would like to add or change anything in the plan, please feel free to let me know. We can discuss it and make the necessary adjustments.</span>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <a class="logo" href="#top">PepLookup</a>
+  <span>Adam Dan · Founder, PepLookup</span>
+</footer>
+
+<script>
+(function(){
+  var els=document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return;}
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});
+  },{threshold:.12,rootMargin:'0px 0px -30px 0px'});
+  els.forEach(function(e){io.observe(e)});
+
+  var links=document.querySelectorAll('.nav-links a');
+  var spy=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){
+        links.forEach(function(l){
+          var on=l.getAttribute('href')==='#'+en.target.id;
+          l.classList.toggle('active',on);
+          if(on&&l.scrollIntoView&&window.innerWidth<760){l.parentNode.scrollTo({left:l.offsetLeft-60,behavior:'smooth'});}
+        });
+      }
+    });
+  },{rootMargin:'-45% 0px -50% 0px'});
+  ['summary','platform','community','pricing','monthly','notes'].forEach(function(id){var s=document.getElementById(id);if(s)spy.observe(s);});
+})();
+</script>
+</body>
+</html>
